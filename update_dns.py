@@ -62,7 +62,6 @@ def update_dns(record, new_ip):
     external IP is not the same
     :return:
     """
-    # TODO: Seems to only ADD records, need to fix to UPDATE a record
     domain = extract_domain(record)
     zone_id = get_zone_id(domain)
 
@@ -81,6 +80,8 @@ def update_dns(record, new_ip):
 
 
 def main():
+    # TODO: Add logging
+    # TODO: Add email notifications when updates are made
     records_to_check = ['home.brieden.org', 'cloud.txmoose.com', 'home.txmoose.com']
     current_ip = get_current_ip()
 
