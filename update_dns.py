@@ -101,9 +101,6 @@ def main():
     for record_to_check in records_to_check:
         if get_current_dns(record_to_check) != current_ip:
             update_dns(record_to_check, current_ip)
-            print("Updated {}".format(record_to_check))
-        else:
-            print("Records match")
 
 
 if __name__ == '__main__':
