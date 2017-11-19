@@ -5,6 +5,8 @@ Script to check external IP address and update CloudFlare zones accordingly
 
 import CloudFlare
 import requests
+import smtplib
+from email.message import EmailMessage
 from config import *
 
 
@@ -71,18 +73,29 @@ def update_dns(record, new_ip):
         if dns_record['name'] == record:
             updated_record = dns_record
             record_id = dns_record['id']
+            old_content = dns_record['content']
 
     updated_record['content'] = new_ip
 
     d = cf.zones.dns_records.delete(zone_id, record_id)
     r = cf.zones.dns_records.post(zone_id, data=updated_record)
 
+    # Sending email to notify of changes made
+    email_subject = "[DNS Update] {} updated from {} to {}".format(record, old_content, new_ip)
+
+    msg = EmailMessage()
+    msg.set_content("<EOM>")
+    msg['Subject'] = email_subject
+    msg['From'] = 'dns_update@txmoose.com'
+    msg['To'] = REPORT_EMAIL
+
+    s = smtplib.SMTP(host=SMTP_SERVER, port=SMTP_PORT)
+    s.send_message(msg)
+    s.quit()
 
 
 def main():
-    # TODO: Add logging
-    # TODO: Add email notifications when updates are made
-    records_to_check = ['home.brieden.org', 'cloud.txmoose.com', 'home.txmoose.com']
+    records_to_check = RECORDS_TO_WATCH
     current_ip = get_current_ip()
 
     for record_to_check in records_to_check:
