@@ -21,10 +21,11 @@ def extract_domain(record):
     """
     return '.'.join(record.split('.')[-2:])
 
+
 def get_zone_id(domain):
     """
     Helper function to get zone ID from Cloudflare
-    :param record: Cloudflare Zone as a string
+    :param domain: Cloudflare Zone as a string
     :return: zone ID as a string
     """
     zones = cf.zones.get()
