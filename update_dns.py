@@ -3,6 +3,9 @@
 Script to check external IP address and update CloudFlare zones accordingly
 """
 
+import argparse
+from os import F_TEST
+
 import CloudFlare
 import requests
 import smtplib
@@ -80,7 +83,10 @@ def update_dns(record, new_ip):
 
     d = cf.zones.dns_records.delete(zone_id, record_id)
     r = cf.zones.dns_records.post(zone_id, data=updated_record)
+    send_email(record, old_content, new_ip)
 
+
+def send_email(record="test", old_content="old_content_test", new_ip="new_ip_test"):
     # Sending email to notify of changes made
     email_subject = "[DNS Update] {} updated from {} to {}".format(record, old_content, new_ip)
 
@@ -96,6 +102,14 @@ def update_dns(record, new_ip):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--email-test', help="Will send a test email only", action="store_true")
+    args = parser.parse_args()
+
+    if(args.email_test):
+        send_email()
+        exit()
+
     records_to_check = RECORDS_TO_WATCH
     current_ip = get_current_ip()
 
